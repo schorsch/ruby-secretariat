@@ -55,10 +55,12 @@ module Secretariat
   }
 
   UNIT_CODES = {
-    :PIECE => "C62",
+    :ONE => "C62",  
+    :PIECE => "H87",
     :DAY => "DAY",
     :HECTARE => "HAR",
     :HOUR => "HUR",
+    :MONTH => "MON",
     :KILOGRAM => "KGM",
     :KILOMETER => "KTM",
     :KILOWATTHOUR => "KWH",
@@ -75,6 +77,9 @@ module Secretariat
     :PERCENT => "P1",
     :SET => "SET",
     :TON => "TNE",
-    :WEEK => "WEE"
+    :WEEK => "WEE",
+    :BOTTLE => "BO",
+    :CARTON => "CT",
+    :CAN => "CA",
   }
 end
