@@ -64,7 +64,7 @@ module Secretariat
       tax = BigDecimal(tax_amount)
       basis = BigDecimal(basis_amount)
       calc_tax = basis * BigDecimal(tax_percent) / BigDecimal(100)
-      calc_tax = calc_tax.round(2, :down)
+      calc_tax = calc_tax.round(2)
       if tax != calc_tax
         @errors << "Tax amount and calculated tax amount deviate: #{tax} / #{calc_tax}"
         return false
