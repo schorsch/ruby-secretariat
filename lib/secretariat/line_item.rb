@@ -51,6 +51,7 @@ module Secretariat
       charge_price = BigDecimal(charge_amount)
       tax = BigDecimal(tax_amount)
       unit_price = net_price * BigDecimal(quantity)
+      unit_price = unit_price.round(2)
 
       if charge_price != unit_price
         @errors << "charge price and gross price times quantity deviate: #{charge_price} / #{unit_price}"
