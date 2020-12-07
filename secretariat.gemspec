@@ -1,5 +1,6 @@
 require_relative 'lib/secretariat/version'
-require 'rake'
+require 'rake/testtask'
+
 Gem::Specification.new do |s|
   s.name        = 'secretariat'
   s.version     = Secretariat::VERSION
