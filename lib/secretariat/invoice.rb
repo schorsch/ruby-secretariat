@@ -34,6 +34,7 @@ module Secretariat
     :grand_total_amount,
     :due_amount,
     :paid_amount,
+    :buyer_reference,
 
     keyword_init: true
   ) do
@@ -154,6 +155,11 @@ module Secretariat
             trade_agreement = by_version(version, 'ApplicableSupplyChainTradeAgreement', 'ApplicableHeaderTradeAgreement')
 
             xml['ram'].send(trade_agreement) do
+              if version == 2 && !buyer_reference.nil?
+                xml['ram'].BuyerReference do
+                  xml.text(buyer_reference)
+                end
+              end
               xml['ram'].SellerTradeParty do
                 seller.to_xml(xml, version: version)
               end

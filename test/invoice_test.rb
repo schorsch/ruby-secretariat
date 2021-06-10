@@ -48,7 +48,8 @@ module Secretariat
         basis_amount: '29',
         grand_total_amount: 29,
         due_amount: 0,
-        paid_amount: 29
+        paid_amount: 29,
+        buyer_reference: 'REF-112233'
       )
     end
 
@@ -99,7 +100,8 @@ module Secretariat
         basis_amount: '20',
         grand_total_amount: '23.80',
         due_amount: 0,
-        paid_amount: '23.80'
+        paid_amount: '23.80',
+        buyer_reference: 'REF-112233'
       )
     end
 
