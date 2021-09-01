@@ -26,6 +26,7 @@ module Secretariat
     :currency_code,
     :payment_type,
     :payment_text,
+    :payment_iban,
     :tax_category,
     :tax_percent,
     :tax_amount,
@@ -190,6 +191,11 @@ module Secretariat
               xml['ram'].SpecifiedTradeSettlementPaymentMeans do
                 xml['ram'].TypeCode payment_code
                 xml['ram'].Information payment_text
+                if payment_iban && payment_iban != ''
+                  xml['ram'].PayeePartyCreditorFinancialAccount do
+                    xml['ram'].IBANID payment_iban
+                  end
+                end
               end
               xml['ram'].ApplicableTradeTax do
 
