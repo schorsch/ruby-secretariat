@@ -45,6 +45,8 @@ module Secretariat
    :DEBITADVICE => "31",
    :CREDITCARD => "48",
    :DEBIT => "49",
+   :SEPA_CREDIT => "58",
+   :SEPA_DEBIT => "59",
    :COMPENSATION => "97",
   }
 
