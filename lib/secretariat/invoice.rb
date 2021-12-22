@@ -125,7 +125,7 @@ module Secretariat
 
           xml['rsm'].send(context) do
             xml['ram'].GuidelineSpecifiedDocumentContextParameter do
-              version_id = by_version(version, 'urn:ferd:CrossIndustryDocument:invoice:1p0:comfort', 'urn:cen.eu:en16931:2017')
+              version_id = by_version(version, 'urn:ferd:CrossIndustryDocument:invoice:1p0:comfort', 'urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_2.0')
               xml['ram'].ID version_id
             end
           end
