@@ -16,7 +16,7 @@ limitations under the License.
 
 module Secretariat
   TradeParty = Struct.new('TradeParty',
-    :name, :street1, :street2, :city, :postal_code, :country_id, :vat_id,
+    :name, :street1, :street2, :city, :postal_code, :country_id, :vat_id, :contact_name,
     keyword_init: true,
   ) do
     def to_xml(xml, exclude_tax: false, version: 2)
@@ -29,6 +29,11 @@ module Secretariat
         end
         xml['ram'].CityName city
         xml['ram'].CountryID country_id
+      end
+      if contact_name && contact_name != ''
+        xml['ram'].DefinedTradeContact do
+          xml['ram'].PersonName contact_name
+        end
       end
       if !exclude_tax && vat_id && vat_id != ''
         xml['ram'].SpecifiedTaxRegistration do
