@@ -16,11 +16,18 @@ limitations under the License.
 
 module Secretariat
   TradeParty = Struct.new('TradeParty',
-    :name, :street1, :street2, :city, :postal_code, :country_id, :vat_id, :contact_name,
+    :name, :street1, :street2, :city, :postal_code, :country_id, :vat_id, :contact_name, :contact_phone, :contact_email,
     keyword_init: true,
   ) do
     def to_xml(xml, exclude_tax: false, version: 2)
       xml['ram'].Name name
+      if contact_name && contact_name != ''
+        xml['ram'].DefinedTradeContact do
+          xml['ram'].PersonName contact_name
+          xml['ram'].TelephoneUniversalCommunication contact_phone if contact_phone && !contact_phone == ''
+          xml['ram'].EmailURIUniversalCommunication contact_email if contact_email && !contact_email == ''
+        end
+      end
       xml['ram'].PostalTradeAddress do
         xml['ram'].PostcodeCode postal_code
         xml['ram'].LineOne street1
@@ -29,11 +36,6 @@ module Secretariat
         end
         xml['ram'].CityName city
         xml['ram'].CountryID country_id
-      end
-      if contact_name && contact_name != ''
-        xml['ram'].DefinedTradeContact do
-          xml['ram'].PersonName contact_name
-        end
       end
       if !exclude_tax && vat_id && vat_id != ''
         xml['ram'].SpecifiedTaxRegistration do
