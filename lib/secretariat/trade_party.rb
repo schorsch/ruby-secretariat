@@ -24,12 +24,12 @@ module Secretariat
       if contact_name && contact_name != ''
         xml['ram'].DefinedTradeContact do
           xml['ram'].PersonName contact_name
-          if contact_phone && !contact_phone == ''
+          if contact_phone && contact_phone != ''
             xml['ram'].TelephoneUniversalCommunication do
               xml['ram'].CompleteNumber contact_phone
             end
           end
-          if contact_email && !contact_email == ''
+          if contact_email && contact_email != ''
             xml['ram'].EmailURIUniversalCommunication do
               xml['ram'].URIID contact_email
             end
