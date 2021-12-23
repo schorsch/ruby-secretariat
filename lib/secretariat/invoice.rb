@@ -106,9 +106,15 @@ module Secretariat
       )
     end
 
-    def to_xml(version: 1, skip_validation: false)
+    def to_xml(version: 1, skip_validation: false, mode: :zugferd)
       if version < 1 || version > 2
         raise 'Unsupported Document Version'
+      end
+      if mode != :zugferd && mode != :xrechnung
+        raise 'Unsupported Document Mode'
+      end
+      if mode == :xrechnung && version < 2
+        raise 'Mode XRechnung requires Document Version > 1'
       end
 
       if !skip_validation && !valid?
@@ -125,7 +131,10 @@ module Secretariat
 
           xml['rsm'].send(context) do
             xml['ram'].GuidelineSpecifiedDocumentContextParameter do
-              version_id = by_version(version, 'urn:ferd:CrossIndustryDocument:invoice:1p0:comfort', 'urn:cen.eu:en16931:2017#compliant#urn:xoev-de:kosit:standard:xrechnung_2.0')
+              version_id = by_version(version, 'urn:ferd:CrossIndustryDocument:invoice:1p0:comfort', 'urn:cen.eu:en16931:2017')
+              if mode == :xrechnung
+                version_id += '#compliant#urn:xoev-de:kosit:standard:xrechnung_2.0'
+              end
               xml['ram'].ID version_id
             end
           end
