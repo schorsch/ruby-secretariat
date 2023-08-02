@@ -133,7 +133,7 @@ module Secretariat
             xml['ram'].GuidelineSpecifiedDocumentContextParameter do
               version_id = by_version(version, 'urn:ferd:CrossIndustryDocument:invoice:1p0:comfort', 'urn:cen.eu:en16931:2017')
               if mode == :xrechnung
-                version_id += '#compliant#urn:xoev-de:kosit:standard:xrechnung_2.0'
+                version_id += '#compliant#urn:xoev-de:kosit:standard:xrechnung_2.3'
               end
               xml['ram'].ID version_id
             end
