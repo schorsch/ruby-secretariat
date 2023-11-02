@@ -36,6 +36,9 @@ module Secretariat
     :due_amount,
     :paid_amount,
     :buyer_reference,
+    :payment_description,
+    :payment_status,
+    :payment_due_date,
 
     keyword_init: true
   ) do
@@ -220,7 +223,16 @@ module Secretariat
                 xml['ram'].send(percent, Helpers.format(tax_percent))
               end
               xml['ram'].SpecifiedTradePaymentTerms do
-                xml['ram'].Description "Paid"
+                if payment_status == 'unpaid'
+                  xml['ram'].Description payment_description
+                  xml['ram'].DueDateDateTime do 
+                    xml['udt'].DateTimeString(format: '102') do
+                      xml.text(payment_due_date&.strftime('%Y%m%d'))
+                    end
+                  end
+                else
+                  xml['ram'].Description payment_status.capitalize
+                end
               end
 
               monetary_summation = by_version(version, 'SpecifiedTradeSettlementMonetarySummation', 'SpecifiedTradeSettlementHeaderMonetarySummation')
