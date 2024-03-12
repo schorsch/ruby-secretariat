@@ -96,7 +96,7 @@ module Secretariat
         xml['ram'].AssociatedDocumentLineDocument do
           xml['ram'].LineID line_item_index
         end
-        if (version == 2)
+        if (version >= 2)
           xml['ram'].SpecifiedTradeProduct do
             xml['ram'].Name name
             xml['ram'].OriginTradeCountry do
@@ -109,7 +109,7 @@ module Secretariat
         xml['ram'].send(agreement) do
           xml['ram'].GrossPriceProductTradePrice do
             Helpers.currency_element(xml, 'ram', 'ChargeAmount', gross_amount, currency_code, add_currency: version == 1, digits: 4)
-            if version == 2 && discount_amount
+            if version >= 2 && discount_amount
               xml['ram'].BasisQuantity(unitCode: unit_code) do
                 xml.text(Helpers.format(quantity, digits: 4))
               end
@@ -133,7 +133,7 @@ module Secretariat
           end
           xml['ram'].NetPriceProductTradePrice do
             Helpers.currency_element(xml, 'ram', 'ChargeAmount', net_amount, currency_code, add_currency: version == 1, digits: 4)
-            if version == 2
+            if version >= 2
               xml['ram'].BasisQuantity(unitCode: unit_code) do
                 xml.text(Helpers.format(quantity, digits: 4))
               end

@@ -45,6 +45,13 @@ module Secretariat
         xml['ram'].CityName city
         xml['ram'].CountryID country_id
       end
+      if version == 3 && contact_email.present?
+        xml['ram'].URIUniversalCommunication do
+          xml['ram'].URIID(schemeID: 'EM') do
+            xml.text(contact_email)
+          end
+        end
+      end
       if !exclude_tax && vat_id && vat_id != ''
         xml['ram'].SpecifiedTaxRegistration do
           xml['ram'].ID(schemeID: 'VA') do

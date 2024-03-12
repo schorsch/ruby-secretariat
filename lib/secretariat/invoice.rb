@@ -110,7 +110,7 @@ module Secretariat
     end
 
     def to_xml(version: 1, skip_validation: false, mode: :zugferd)
-      if version < 1 || version > 2
+      if version < 1 || version > 3
         raise 'Unsupported Document Version'
       end
       if mode != :zugferd && mode != :xrechnung
@@ -133,10 +133,16 @@ module Secretariat
           context = by_version(version, 'SpecifiedExchangedDocumentContext', 'ExchangedDocumentContext')
 
           xml['rsm'].send(context) do
+            if version == 3 && mode == :xrechnung
+              xml['ram'].BusinessProcessSpecifiedDocumentContextParameter do
+                xml['ram'].ID 'urn:fdc:peppol.eu:2017:poacc:billing:01:1.0'
+              end
+            end
             xml['ram'].GuidelineSpecifiedDocumentContextParameter do
               version_id = by_version(version, 'urn:ferd:CrossIndustryDocument:invoice:1p0:comfort', 'urn:cen.eu:en16931:2017')
               if mode == :xrechnung
-                version_id += '#compliant#urn:xoev-de:kosit:standard:xrechnung_2.3'
+                version_id += '#compliant#urn:xoev-de:kosit:standard:xrechnung_2.3' if version == 2
+                version_id += '#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0' if version == 3
               end
               xml['ram'].ID version_id
             end
@@ -159,7 +165,7 @@ module Secretariat
           transaction = by_version(version, 'SpecifiedSupplyChainTradeTransaction', 'SupplyChainTradeTransaction')
           xml['rsm'].send(transaction) do
 
-            if version == 2
+            if version >= 2
               line_items.each_with_index do |item, i|
                 item.to_xml(xml, i + 1, version: version, skip_validation: skip_validation) # one indexed
               end
@@ -168,7 +174,7 @@ module Secretariat
             trade_agreement = by_version(version, 'ApplicableSupplyChainTradeAgreement', 'ApplicableHeaderTradeAgreement')
 
             xml['ram'].send(trade_agreement) do
-              if version == 2 && !buyer_reference.nil?
+              if version >= 2 && !buyer_reference.nil?
                 xml['ram'].BuyerReference do
                   xml.text(buyer_reference)
                 end
@@ -184,7 +190,7 @@ module Secretariat
             delivery = by_version(version, 'ApplicableSupplyChainTradeDelivery', 'ApplicableHeaderTradeDelivery')
 
             xml['ram'].send(delivery) do
-              if version == 2
+              if version >= 2
                 xml['ram'].ShipToTradeParty do
                   buyer.to_xml(xml, exclude_tax: true, version: version)
                 end
