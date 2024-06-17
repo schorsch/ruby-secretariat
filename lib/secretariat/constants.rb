@@ -64,7 +64,7 @@ module Secretariat
     :HOUR => "HUR",
     :MONTH => "MON",
     :KILOGRAM => "KGM",
-    :KILOMETER => "KTM",
+    :KILOMETER => "KMT",
     :KILOWATTHOUR => "KWH",
     :FIXEDRATE => "LS",
     :LITRE => "LTR",
