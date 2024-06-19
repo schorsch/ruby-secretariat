@@ -111,7 +111,7 @@ module Secretariat
             Helpers.currency_element(xml, 'ram', 'ChargeAmount', gross_amount, currency_code, add_currency: version == 1, digits: 4)
             if version >= 2 && discount_amount
               xml['ram'].BasisQuantity(unitCode: unit_code) do
-                xml.text(Helpers.format(quantity, digits: 4))
+                xml.text(Helpers.format(BASIS_QUANTITY, digits: 4))
               end
               xml['ram'].AppliedTradeAllowanceCharge do
                 xml['ram'].ChargeIndicator do
@@ -135,7 +135,7 @@ module Secretariat
             Helpers.currency_element(xml, 'ram', 'ChargeAmount', net_amount, currency_code, add_currency: version == 1, digits: 4)
             if version >= 2
               xml['ram'].BasisQuantity(unitCode: unit_code) do
-                xml.text(Helpers.format(quantity, digits: 4))
+                xml.text(Helpers.format(BASIS_QUANTITY, digits: 4))
               end
             end
           end

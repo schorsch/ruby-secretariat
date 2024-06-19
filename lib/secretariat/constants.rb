@@ -16,6 +16,8 @@ limitations under the License.
 
 module Secretariat
 
+  BASIS_QUANTITY = 1.0
+
   TAX_CATEGORY_CODES = {
    :STANDARDRATE => "S",
    :REVERSECHARGE => "AE",
