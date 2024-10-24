@@ -15,17 +15,6 @@ module Secretariat
       assert_equal [], v.validate_against_schematron
     end
 
-    def test_schema_validator_1
-      xml = open(File.join(__dir__, 'fixtures/zugferd_1/einfach.xml'))
-      v = Validator.new(xml, version: 1)
-      assert_equal [], v.validate_against_schema
-    end
-
-    def test_schematron_validator_1
-      xml = open(File.join(__dir__, 'fixtures/zugferd_1/einfach.xml'))
-      v = Validator.new(xml, version: 1)
-      assert_equal [], v.validate_against_schematron
-    end
   end
 end
 

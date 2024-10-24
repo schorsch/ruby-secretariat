@@ -151,50 +151,5 @@ module Secretariat
       assert_equal [], errors
     end
 
-    def test_simple_de_invoice_v1
-      xml = make_de_invoice.to_xml(version: 1)
-      v = Validator.new(xml, version: 1)
-      errors = v.validate_against_schema
-      if !errors.empty?
-        puts xml
-        errors.each do |error|
-          puts error
-        end
-      end
-      assert_equal [], errors
-    end
-
-    def test_simple_eu_invoice_v1
-      begin
-        xml = make_eu_invoice.to_xml(version: 1)
-      rescue ValidationError => e
-        pp e.errors
-      end
-
-      v = Validator.new(xml, version: 1)
-      errors = v.validate_against_schema
-      if !errors.empty?
-        puts xml
-        errors.each do |error|
-          puts error
-        end
-      end
-      assert_equal [], errors
-    rescue ValidationError => e
-      puts e.errors
-    end
-
-    def test_simple_de_invoice_against_schematron
-      xml = make_de_invoice.to_xml(version: 1)
-      v = Validator.new(xml, version: 1)
-      errors = v.validate_against_schematron
-      if !errors.empty?
-        puts xml
-        errors.each do |error|
-          puts "#{error[:line]}: #{error[:message]}"
-        end
-      end
-      assert_equal [], errors
-    end
   end
 end

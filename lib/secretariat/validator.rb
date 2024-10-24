@@ -21,32 +21,30 @@ require 'open-uri'
 module Secretariat
   class Validator
     SCHEMATRON = [
-      '../../schemas/zugferd_1/ZUGFeRD1p0.sch',
       '../../schemas/zugferd_2/zf_en16931.sch'
     ]
 
     SCHEMA = [
-      '../../schemas/zugferd_1/ZUGFeRD1p0.xsd',
       '../../schemas/zugferd_2/zf_en16931.xsd'
     ]
 
     SCHEMA_DIR = [
-      '../../schemas/zugferd_1',
       '../../schemas/zugferd_2'
     ]
     attr_accessor :doc, :version
-    def initialize(io_or_str, version: 1)
+
+    def initialize(io_or_str, version: 2)
       @doc = Nokogiri.XML(io_or_str)
       @version = version
     end
 
     def schema
-      Nokogiri::XML.Schema open(File.join(__dir__, SCHEMA[version - 1]))
+      Nokogiri::XML.Schema open(File.join(__dir__, SCHEMA[version - 2]))
     end
 
     def schematron
       SchematronNokogiri::Schema.new(
-        Nokogiri::XML(open(File.join(__dir__, SCHEMATRON[version - 1])))
+        Nokogiri::XML(open(File.join(__dir__, SCHEMATRON[version - 2])))
       )
     end
 
@@ -56,7 +54,7 @@ module Secretariat
 
     def validate_against_schematron
       result = []
-      Dir.chdir File.join(__dir__, SCHEMA_DIR[version - 1]) do
+      Dir.chdir File.join(__dir__, SCHEMA_DIR[version - 2]) do
         result = schematron.validate(doc)
       end
       result

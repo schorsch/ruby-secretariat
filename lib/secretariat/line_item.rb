@@ -38,7 +38,6 @@ module Secretariat
     keyword_init: true
   ) do
 
-    include Versioner
 
     def errors
       @errors
@@ -80,9 +79,6 @@ module Secretariat
     end
 
     def tax_category_code(version: 2)
-      if version == 1
-        return TAX_CATEGORY_CODES_1[tax_category] || 'S'
-      end
       TAX_CATEGORY_CODES[tax_category] || 'S'
     end
 
@@ -104,12 +100,10 @@ module Secretariat
             end
           end
         end
-        agreement = by_version(version, 'SpecifiedSupplyChainTradeAgreement', 'SpecifiedLineTradeAgreement')
-
-        xml['ram'].send(agreement) do
+        xml['ram'].SpecifiedLineTradeAgreement do
           xml['ram'].GrossPriceProductTradePrice do
-            Helpers.currency_element(xml, 'ram', 'ChargeAmount', gross_amount, currency_code, add_currency: version == 1, digits: 4)
-            if version >= 2 && discount_amount
+            Helpers.currency_element(xml, 'ram', 'ChargeAmount', gross_amount, currency_code, add_currency: false, digits: 4)
+            if discount_amount
               xml['ram'].BasisQuantity(unitCode: unit_code) do
                 xml.text(Helpers.format(BASIS_QUANTITY, digits: 4))
               end
@@ -117,60 +111,37 @@ module Secretariat
                 xml['ram'].ChargeIndicator do
                   xml['udt'].Indicator 'false'
                 end
-                Helpers.currency_element(xml, 'ram', 'ActualAmount', discount_amount, currency_code, add_currency: version == 1)
-                xml['ram'].Reason discount_reason
-              end
-            end
-            if version == 1 && discount_amount
-              xml['ram'].AppliedTradeAllowanceCharge do
-                xml['ram'].ChargeIndicator do
-                  xml['udt'].Indicator 'false'
-                end
-                Helpers.currency_element(xml, 'ram', 'ActualAmount', discount_amount, currency_code, add_currency: version == 1)
+                Helpers.currency_element(xml, 'ram', 'ActualAmount', discount_amount, currency_code, add_currency: false)
                 xml['ram'].Reason discount_reason
               end
             end
           end
           xml['ram'].NetPriceProductTradePrice do
-            Helpers.currency_element(xml, 'ram', 'ChargeAmount', net_amount, currency_code, add_currency: version == 1, digits: 4)
-            if version >= 2
-              xml['ram'].BasisQuantity(unitCode: unit_code) do
-                xml.text(Helpers.format(BASIS_QUANTITY, digits: 4))
-              end
+            Helpers.currency_element(xml, 'ram', 'ChargeAmount', net_amount, currency_code, add_currency: false, digits: 4)
+            xml['ram'].BasisQuantity(unitCode: unit_code) do
+              xml.text(Helpers.format(BASIS_QUANTITY, digits: 4))
             end
           end
         end
 
-        delivery = by_version(version, 'SpecifiedSupplyChainTradeDelivery', 'SpecifiedLineTradeDelivery')
-
-        xml['ram'].send(delivery) do
+        xml['ram'].SpecifiedLineTradeDelivery do
           xml['ram'].BilledQuantity(unitCode: unit_code) do
             xml.text(Helpers.format(quantity, digits: 4))
           end
         end
 
-        settlement = by_version(version, 'SpecifiedSupplyChainTradeSettlement', 'SpecifiedLineTradeSettlement')
-
-        xml['ram'].send(settlement) do
+        xml['ram'].SpecifiedLineTradeSettlement do
           xml['ram'].ApplicableTradeTax do
             xml['ram'].TypeCode 'VAT'
             xml['ram'].CategoryCode tax_category_code(version: version)
-
-            percent = by_version(version, 'ApplicablePercent', 'RateApplicablePercent')
-            xml['ram'].send(percent,Helpers.format(tax_percent))
-
+            xml['ram'].RateApplicablePercent Helpers.format(tax_percent)
           end
-          monetary_summation = by_version(version, 'SpecifiedTradeSettlementMonetarySummation', 'SpecifiedTradeSettlementLineMonetarySummation')
-          xml['ram'].send(monetary_summation) do
-            Helpers.currency_element(xml, 'ram', 'LineTotalAmount', charge_amount, currency_code, add_currency: version == 1)
+
+          xml['ram'].SpecifiedTradeSettlementLineMonetarySummation do
+            Helpers.currency_element(xml, 'ram', 'LineTotalAmount', charge_amount, currency_code, add_currency: false)
           end
         end
 
-        if version == 1
-          xml['ram'].SpecifiedTradeProduct do
-            xml['ram'].Name name
-          end
-        end
       end
     end
   end

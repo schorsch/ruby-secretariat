@@ -28,16 +28,6 @@ module Secretariat
    :EXPORT => 'G'
   }
 
-  TAX_CATEGORY_CODES_1 = {
-   :STANDARDRATE => "S",
-   :REVERSECHARGE => "AE",
-   :TAXEXEMPT => "E",
-   :ZEROTAXPRODUCTS => "Z",
-   :UNTAXEDSERVICE => "O",
-   :INTRACOMMUNITY => "IC",
-   :EXPORT => 'E'
-  }
-
   PAYMENT_CODES = {
    :BANKACCOUNT => "42",
    :NOTSPECIFIED => "1",
@@ -59,7 +49,7 @@ module Secretariat
   }
 
   UNIT_CODES = {
-    :ONE => "C62",  
+    :ONE => "C62",
     :PIECE => "H87",
     :DAY => "DAY",
     :HECTARE => "HAR",

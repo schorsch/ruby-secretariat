@@ -43,7 +43,6 @@ module Secretariat
     keyword_init: true
   ) do
 
-    include Versioner
 
     def errors
       @errors
@@ -91,14 +90,8 @@ module Secretariat
     end
 
 
-    def namespaces(version: 1)
-      by_version(version,
-        {
-          'xmlns:ram' => 'urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:12',
-          'xmlns:udt' => 'urn:un:unece:uncefact:data:standard:UnqualifiedDataType:15',
-          'xmlns:rsm' => 'urn:ferd:CrossIndustryDocument:invoice:1p0',
-          'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance'
-        },
+    def namespaces
+
         {
           'xmlns:qdt' => 'urn:un:unece:uncefact:data:standard:QualifiedDataType:100',
           'xmlns:ram' => 'urn:un:unece:uncefact:data:standard:ReusableAggregateBusinessInformationEntity:100',
@@ -106,18 +99,14 @@ module Secretariat
           'xmlns:rsm' => 'urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100',
           'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance'
         }
-      )
     end
 
-    def to_xml(version: 1, skip_validation: false, mode: :zugferd)
-      if version < 1 || version > 3
+    def to_xml(version: 2, skip_validation: false, mode: :zugferd)
+      if version < 2 || version > 3
         raise 'Unsupported Document Version'
       end
       if mode != :zugferd && mode != :xrechnung
         raise 'Unsupported Document Mode'
-      end
-      if mode == :xrechnung && version < 2
-        raise 'Mode XRechnung requires Document Version > 1'
       end
 
       if !skip_validation && !valid?
@@ -126,20 +115,15 @@ module Secretariat
 
       builder = Nokogiri::XML::Builder.new do |xml|
 
-        root = by_version(version, 'CrossIndustryDocument', 'CrossIndustryInvoice')
-
-        xml['rsm'].send(root, namespaces(version: version)) do
-
-          context = by_version(version, 'SpecifiedExchangedDocumentContext', 'ExchangedDocumentContext')
-
-          xml['rsm'].send(context) do
+        xml['rsm'].CrossIndustryInvoice(namespaces) do
+          xml['rsm'].ExchangedDocumentContext do
             if version == 3 && mode == :xrechnung
               xml['ram'].BusinessProcessSpecifiedDocumentContextParameter do
                 xml['ram'].ID 'urn:fdc:peppol.eu:2017:poacc:billing:01:1.0'
               end
             end
             xml['ram'].GuidelineSpecifiedDocumentContextParameter do
-              version_id = by_version(version, 'urn:ferd:CrossIndustryDocument:invoice:1p0:comfort', 'urn:cen.eu:en16931:2017')
+              version_id ='urn:cen.eu:en16931:2017'
               if mode == :xrechnung
                 version_id += '#compliant#urn:xoev-de:kosit:standard:xrechnung_2.3' if version == 2
                 version_id += '#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0' if version == 3
@@ -148,13 +132,8 @@ module Secretariat
             end
           end
 
-          header = by_version(version, 'HeaderExchangedDocument', 'ExchangedDocument')
-
-          xml['rsm'].send(header) do
+          xml['rsm'].ExchangedDocument do
             xml['ram'].ID id
-            if version == 1
-              xml['ram'].Name "RECHNUNG"
-            end
             xml['ram'].TypeCode '380' # TODO: make configurable
             xml['ram'].IssueDateTime do
               xml['udt'].DateTimeString(format: '102') do
@@ -162,8 +141,8 @@ module Secretariat
               end
             end
           end
-          transaction = by_version(version, 'SpecifiedSupplyChainTradeTransaction', 'SupplyChainTradeTransaction')
-          xml['rsm'].send(transaction) do
+
+          xml['rsm'].SupplyChainTradeTransaction do
 
             if version >= 2
               line_items.each_with_index do |item, i|
@@ -171,9 +150,7 @@ module Secretariat
               end
             end
 
-            trade_agreement = by_version(version, 'ApplicableSupplyChainTradeAgreement', 'ApplicableHeaderTradeAgreement')
-
-            xml['ram'].send(trade_agreement) do
+            xml['ram'].ApplicableHeaderTradeAgreement do
               if version >= 2 && !buyer_reference.nil?
                 xml['ram'].BuyerReference do
                   xml.text(buyer_reference)
@@ -187,9 +164,7 @@ module Secretariat
               end
             end
 
-            delivery = by_version(version, 'ApplicableSupplyChainTradeDelivery', 'ApplicableHeaderTradeDelivery')
-
-            xml['ram'].send(delivery) do
+            xml['ram'].ApplicableHeaderTradeDelivery do
               if version >= 2
                 xml['ram'].ShipToTradeParty do
                   buyer.to_xml(xml, exclude_tax: true, version: version)
@@ -203,8 +178,8 @@ module Secretariat
                 end
               end
             end
-            trade_settlement = by_version(version, 'ApplicableSupplyChainTradeSettlement', 'ApplicableHeaderTradeSettlement')
-            xml['ram'].send(trade_settlement) do
+
+            xml['ram'].ApplicableHeaderTradeSettlement do
               xml['ram'].InvoiceCurrencyCode currency_code
               xml['ram'].SpecifiedTradeSettlementPaymentMeans do
                 xml['ram'].TypeCode payment_code
@@ -215,6 +190,7 @@ module Secretariat
                   end
                 end
               end
+              # convert to each tax
               xml['ram'].ApplicableTradeTax do
 
                 Helpers.currency_element(xml, 'ram', 'CalculatedAmount', tax_amount, currency_code, add_currency: version == 1)
@@ -225,9 +201,9 @@ module Secretariat
                 Helpers.currency_element(xml, 'ram', 'BasisAmount', basis_amount, currency_code, add_currency: version == 1)
                 xml['ram'].CategoryCode tax_category_code(version: version)
 
-                percent = by_version(version, 'ApplicablePercent', 'RateApplicablePercent')
-                xml['ram'].send(percent, Helpers.format(tax_percent))
+                xml['ram'].RateApplicablePercent Helpers.format(tax_percent)
               end
+
               xml['ram'].SpecifiedTradePaymentTerms do
                 if payment_status == 'unpaid'
                   xml['ram'].Description payment_description
@@ -241,9 +217,7 @@ module Secretariat
                 end
               end
 
-              monetary_summation = by_version(version, 'SpecifiedTradeSettlementMonetarySummation', 'SpecifiedTradeSettlementHeaderMonetarySummation')
-
-              xml['ram'].send(monetary_summation) do
+              xml['ram'].SpecifiedTradeSettlementHeaderMonetarySummation do
                 Helpers.currency_element(xml, 'ram', 'LineTotalAmount', basis_amount, currency_code, add_currency: version == 1)
                 # TODO: Fix this!
                 Helpers.currency_element(xml, 'ram', 'ChargeTotalAmount', BigDecimal(0), currency_code, add_currency: version == 1)
@@ -255,11 +229,7 @@ module Secretariat
                 Helpers.currency_element(xml, 'ram', 'DuePayableAmount', due_amount, currency_code, add_currency: version == 1)
               end
             end
-            if version == 1
-              line_items.each_with_index do |item, i|
-                item.to_xml(xml, i + 1, version: version, skip_validation: skip_validation) # one indexed
-              end
-            end
+
           end
         end
       end
