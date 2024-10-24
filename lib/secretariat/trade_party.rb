@@ -19,6 +19,7 @@ module Secretariat
     :name, :street1, :street2, :city, :postal_code, :country_id, :vat_id, :contact_name, :contact_phone, :contact_email,
     keyword_init: true,
   ) do
+
     def to_xml(xml, exclude_tax: false, version: 2)
       xml['ram'].Name name
       if contact_name && contact_name != ''

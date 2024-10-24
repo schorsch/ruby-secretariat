@@ -14,6 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 =end
 
+if RUBY_VERSION < "2.5.0"
+  require 'backports/2.5.0/struct/new'
+end
+
 require_relative 'secretariat/version'
 require_relative 'secretariat/constants'
 require_relative 'secretariat/helpers'

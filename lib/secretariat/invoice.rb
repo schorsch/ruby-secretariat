@@ -231,13 +231,13 @@ module Secretariat
               xml['ram'].SpecifiedTradePaymentTerms do
                 if payment_status == 'unpaid'
                   xml['ram'].Description payment_description
-                  xml['ram'].DueDateDateTime do 
+                  xml['ram'].DueDateDateTime do
                     xml['udt'].DateTimeString(format: '102') do
-                      xml.text(payment_due_date&.strftime('%Y%m%d'))
+                      xml.text(payment_due_date ? payment_due_date.strftime('%Y%m%d') : nil)
                     end
                   end
                 else
-                  xml['ram'].Description payment_status.capitalize
+                  xml['ram'].Description payment_status ? payment_status.capitalize : nil
                 end
               end
 
